@@ -1,0 +1,51 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:c='http://www.springframework.org/schema/c'
+	xsi:schemaLocation="
+            http://www.springframework.org/schema/beans 
+            http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+            http://www.springframework.org/schema/tx 
+            http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+            http://www.springframework.org/schema/context
+            http://www.springframework.org/schema/context/spring-context-3.0.xsd 
+            ">
+	<!-- scanner redis properties -->
+	<!-- 该实例可以配置多个，扫描不同的配置文件，两者配置文件中有同样的参数，后加载的参数不会覆盖先加载的。-->
+	<bean id="propertyConfigurerRedis" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="order" value="1" />		<!-- 加载顺序 -->
+		<property name="ignoreUnresolvablePlaceholders" value="true" />		<!-- 忽略占位符 -->
+		<property name="locations">	<!-- 配置文件位置可以配置多个也可以配置单个 <property name="location" value=""></property> -->
+			<list>
+				<value>classpath:property/redis.properties</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- jedis pool配置 -->
+	<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+		<property name="maxActive" value="${redis.maxActive}" />	<!-- 连接池的最大数据库连接数 -->
+		<property name="maxIdle" value="${redis.maxIdle}" />	<!-- jedis最大空闲实例数 -->	
+		<property name="maxWait" value="${redis.maxWait}" />	<!-- 实例化一个jedis最大的等待时间 -->
+		<property name="testOnBorrow" value="${redis.testOnBorrow}" />	<!-- 是否提前校验jedis实例 -->
+	</bean>
+
+	<!-- spring data redis -->
+	<bean id="jedisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+		<property name="usePool" value="true"></property>
+		<property name="hostName" value="${redis.host}" />
+		<property name="port" value="${redis.port}" />
+		<property name="password" value="${redis.pass}" />
+		<property name="timeout" value="${redis.timeout}" />
+		<property name="database" value="${redis.default.db}"></property>
+		<constructor-arg index="0" ref="jedisPoolConfig" />
+	</bean>
+    
+	<bean id="redisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate">
+		<property name="connectionFactory" ref="jedisConnectionFactory" />
+	</bean>
+	
+	<!-- redis缓存管理器 -->
+<!--   <bean id="cacheManager" class="org.springframework.data.redis.cache.RedisCacheManager"  c:template-ref="redisTemplate"/>   -->
+
+</beans>

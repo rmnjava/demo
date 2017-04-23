@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<beans xmlns="http://www.springframework.org/schema/beans"  
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   
+    xmlns:jee="http://www.springframework.org/schema/jee"  
+    xmlns:tx="http://www.springframework.org/schema/tx"  
+    xmlns:dubbo="http://code.alibabatech.com/schema/dubbo" 
+    xmlns:p="http://www.springframework.org/schema/p" 
+    xmlns:context="http://www.springframework.org/schema/context"  
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd  
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd  
+    http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.1.xsd  
+    http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd"  
+    default-lazy-init="false" >  
+
+   <!-- scanner dubbo properties -->
+	<bean id="propertyConfigurerDubbo" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="order" value="1" />
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+		<property name="locations">
+			<list>
+				<value>classpath:property/dubbo.properties</value>
+			</list>
+		</property>
+	</bean>
+
+   <!-- 提供方应用名称信息，代表应用名称，方便dubbo管理管理工具的管理 -->  
+   <dubbo:application name="${dubbo.application.name}" owner="${dubbo.application.owner}" />
+   <!-- 开启monitor监控 -->
+   <!-- <dubbo:monitor protocol="registry"/> -->
+   <!-- 协议配置 name必填 如果name=dubbo，那么端口默认是20880，其它协议也有默认端口可查找手册。
+   	 如果不配置端口，默认优先取JVM中的dubbo.protocol.port的值，其次是dubbo.properties中的dubbo.protocol.port的值，再者是协议默认的端口。
+   	 但如果这里指定port则以这个为主。所以生产部署时这里不配置而是在tomcat启动的脚本中配置一个 -->  
+   <dubbo:protocol name="${dubbo.protocol.name}" port="${dubbo.protocol.port}" />
+   <!-- 使用zookeeper注册中心暴露服务地址,protocol为注册中心地址的协议, address为注册中心地址,timeout为注册中心请求超时时间  -->   
+   <dubbo:registry protocol="${dubbo.registry.protocol}" address="${dubbo.registry.address}" timeout="60000" />
+   
+   <!-- ========== 消费服务列表 ========== -->
+   <!-- xxx消费者 -->
+   <!-- <dubbo:reference interface="cn.com.xxx.service.xxxService" id="xxxService" timeout="60000" retries="0" check="false" version="0.0.x" /> -->	<!-- timeout,retries 以消费者为主，消费者没有设置则用提供者的设置，提供者没有设置则用默认设置 -->
+        
+   <!-- ========== 提供服务列表 ========= -->
+   <!-- xxx提供者-->
+   <!-- <dubbo:service interface="cn.com.xxx.service.xxxService" ref="xxxService" timeout="60000" retries="0" check="false" version="0.0.x"/> --> <!-- 作为提供者指定超时时间，避免消费者没有指定导致调用超时 -->
+</beans>

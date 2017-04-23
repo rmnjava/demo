@@ -1,0 +1,17 @@
+/*.project
+/demo-parent/demo-dao/.gitignore
+/demo-parent/demo-service/.gitignore
+target/
+.settings/
+*.classpath
+*.log
+*.log.*
+.metadata/
+/demo_dao/*.project
+/demo_service/*.project
+/demo_web/*.project
+/demo_web/src/main/resources/property
+/demo_parent/*.project
+/demo_parent/demo_dao/*.project
+/demo_parent/demo_service/*.project
+/demo_parent/demo_web/*.project
